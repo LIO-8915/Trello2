@@ -48,3 +48,4 @@ use App\Http\Controllers\ConfiguracionController;
 
 Route::get('/config', [ConfiguracionController::class, 'index'])->name('config');
 //Route::put('/config', [ConfiguracionController::class, 'update'])->name('configuraciones.update');
+//Logan R
