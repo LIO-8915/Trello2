@@ -15,17 +15,17 @@ use App\Http\Controllers\Auth_Controller;
 */
 
 Route::get('/login', [Auth_Controller::class, 'showLogin'])->name('Login');
-Route::post('/login', [Auth_Controller::class, 'login']);
+Route::post('/login', [Auth_Controller::class, 'login'])->name('postLogin');
 Route::post('/logout', [Auth_Controller::class, 'logout'])->name('logout');
 Route::post('/register', [Auth_Controller::class, 'register'])->name('register');
 
 Route::get('/', function () {
-    return view('login');
+    return view('welcome');
 })->name('home'); 
 
-Route::get('/login', function () {
-    return view('Login');
-})->name('Login');
+// Route::get('/login', function () {
+//     return view('Login');
+// })->name('Login');
 
 Route::get('/tablero', function () {
     return view('tablero');
@@ -39,10 +39,6 @@ Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome')->middleware('auth');
 
-Route::get('/login', [Auth_Controller::class, 'showLogin'])->name('Login');
-Route::post('/login', [Auth_Controller::class, 'login']);
-Route::post('/logout', [Auth_Controller::class, 'logout'])->name('logout');
-Route::post('/register', [Auth_Controller::class, 'register'])->name('register');
 
 // Route::get('/config', function () {
 //     return view('config');

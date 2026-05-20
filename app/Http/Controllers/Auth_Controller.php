@@ -17,23 +17,25 @@ class Auth_Controller extends Controller
     // Procesa el inicio de sesión
     public function login(Request $request)
     {
-        // Validar los datos de entrada
+        // 1. Validar que lleguen los datos
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // Buscar al usuario por correo
+        // 2. Buscar al usuario manualmente por su correo 
         $user = User::where('email', $request->email)->first();
 
-        // Comparación en texto plano (SIN ENCRIPTAR)
-        if ($user && $user->password === $request->password) {
-            Auth::login($user); // Iniciar sesión manualmente
+        // 3. Comparar contraseña en texto plano (SIN HASH)
+        if ($user && $user->password == $request->password) {
+            Auth::login($user); // Inicia la sesión manualmente en el sistema 
             $request->session()->regenerate();
-            return redirect()->route('welcome'); // Redirección a welcome
+            
+            // 4. Redirigir usando el nombre exacto de la ruta
+            return redirect()->route('home'); 
         }
 
-        // Si falla, regresar con error
+        // Si los datos son incorrectos
         return back()->withErrors([
             'email' => 'Las credenciales no coinciden con nuestros registros.',
         ]);
@@ -63,6 +65,6 @@ class Auth_Controller extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+        return redirect()->route('Login');
     }
 }

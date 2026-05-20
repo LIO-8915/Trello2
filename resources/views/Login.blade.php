@@ -89,8 +89,9 @@
                     <p style="color:  rgb(161, 161, 161);">Log in to Trello 2</p>
                 </div>
                 <div id="login-section">
-                    <form action="{{ route('Login') }}" method="POST">
-                        @csrf <div class="mb-3">
+                    <form action="{{ route('postLogin') }}" method="POST">
+                        @csrf 
+                        <div class="mb-3">
                             <label class="form-label" style="color: rgb(161, 161, 161);">Correo Electrónico</label>
                             <input type="email" name="email" class="form-control" placeholder="correo@ejemplo.com" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color: white;" required>
                         </div>
