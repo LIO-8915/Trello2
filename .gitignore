@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 vendor.rar
+/vendor
 .env
 .env.backup
 .env.production
