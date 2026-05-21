@@ -88,9 +88,10 @@
                     <h2 class="mt-2" style="color:  rgb(161, 161, 161);"><i class="fab fa-trello"></i> Trello 2</h2>
                     <p style="color:  rgb(161, 161, 161);">Log in to Trello 2</p>
                 </div>
+                {{-- SECCIÓN DE INICIO DE SESIÓN --}}
                 <div id="login-section">
-                    <form action="{{ route('postLogin') }}" method="POST">
-                        @csrf 
+                    <form action="{{ route('Login') }}" method="POST">
+                        @csrf
                         <div class="mb-3">
                             <label class="form-label" style="color: rgb(161, 161, 161);">Correo Electrónico</label>
                             <input type="email" name="email" class="form-control" placeholder="correo@ejemplo.com" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color: white;" required>
@@ -104,39 +105,33 @@
                         <button type="submit" class="btn btn-outline-primary w-100 py-2">Iniciar sesión</button>
                     </form>
                     
-                    <div class="text-center mt-3">
-                        <a href="#" class="text-decoration-none" style="color: rgb(114, 114, 114); ;">¿Olvidaste tu contraseña?</a>
-                    </div>
-                    
                     <hr class="my-4">
-                    
                     <div class="text-center">
-                        <span style="color:  rgb(161, 161, 161);">¿No tienes cuenta?</span>
+                        <span style="color: rgb(161, 161, 161);">¿No tienes cuenta?</span>
                         <a href="#" class="text-decoration-none ms-1" onclick="toggleAuth()">Regístrate</a>    
-                    </div>
-
-                    <div class="text-center">
-                        <a href="{{ route('home') }}" class="text-decoration-none ms-1">IGNORAR</a>
                     </div>
                 </div>
 
+                {{-- SECCIÓN DE REGISTRO --}}
                 <div id="register-section" style="display: none;">
-                    <h2 class="mt-2" style="color:  rgb(161, 161, 161);">Crear Cuenta</h2>
+                    <h2 class="mt-2 text-center" style="color: rgb(161, 161, 161); font-size: 20px;">Crear Cuenta</h2>
                     <form action="{{ route('register') }}" method="POST">
                         @csrf
-                        <input type="text" type="text" class="form-control" placeholder="Nombre completo" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color:  rgb(161, 161, 161);" required>
-                        <input type="email" type="text" class="form-control" placeholder="Correo electrónico" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color:  rgb(161, 161, 161);" required>
-                        <input type="password" type="password" class="form-control"placeholder="Contraseña (mín. 8 caracteres)" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color:  rgb(161, 161, 161);" required>
-                        <input type="password" class="form-control" placeholder="Confirmar contraseña" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color:  rgb(161, 161, 161);" required>
+                        <div class="mb-3">
+                            <input type="text" name="name" class="form-control" placeholder="Nombre completo" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color: white;" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" name="email" class="form-control" placeholder="Correo electrónico" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color: white;" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" name="password" class="form-control" placeholder="Contraseña (mín. 8 caracteres)" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color: white;" required>
+                        </div>
                         <button type="submit" class="btn btn-outline-primary w-100 py-2">Registrarse y Volver</button>
                     </form>
 
                     <hr class="my-4">
-
-                    <div class="toggle-link" >
-                        <div class="text-center">
-                            <a onclick="toggleAuth()" class="text-decoration-none ms-1">¿Ya tienes cuenta? Inicia sesión</a>
-                        </div>
+                    <div class="text-center">
+                        <a onclick="toggleAuth()" class="text-decoration-none ms-1" style="cursor: pointer; color: #4c9aff;">¿Ya tienes cuenta? Inicia sesión</a>
                     </div>
                 </div>
             </div>
@@ -151,9 +146,11 @@
             if (loginSec.style.display === "none") {
                 loginSec.style.display = "block";
                 registerSec.style.display = "none";
+                subtitle.innerText = "Log in to Trello 2";
             } else {
                 loginSec.style.display = "none";
                 registerSec.style.display = "block";
+                subtitle.innerText = "Create your account";
             }
         }
 
