@@ -13,7 +13,7 @@ class AuthController extends Controller
         return view('Login');
     }
 
-    // Iniciar Sesión en Texto Plano
+    // Iniciar Sesión comparando texto plano directamente
     public function login(Request $request)
     {
         $request->validate([
@@ -23,6 +23,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
+        // Validación directa sin métodos Bcrypt automáticos
         if ($user && $user->password === $request->password) {
             Auth::login($user);
             $request->session()->regenerate();
@@ -34,29 +35,27 @@ class AuthController extends Controller
         ]);
     }
 
-    // REGISTRO BLINDADO: Cero interacción con la DB si viene nulo
+    // Registro Blindado: Si los datos no cumplen la regla obligatoria, no avanza a la DB
     public function register(Request $request)
     {
-        // 1. Validar estrictamente. Si falla o viene nulo, Laravel corta el flujo AQUÍ.
-        // Jamás pasará a la línea del INSERT INTO.
+        // El validador actúa de freno. Si falta algún campo, cancela todo aquí.
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // 2. Solo si la validación es 100% exitosa y real, se crea el registro en texto plano
+        // Únicamente si superó con éxito la validación se procede al almacenamiento
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => $validated['password'], 
+            'password' => $validated['password'], // Guardado directo sin encriptar
         ]);
 
-        // 3. Redirección con mensaje de éxito
-        return redirect()->route('Login')->with('success', '¡Cuenta registrada con éxito! Ya puedes iniciar sesión.');
+        return redirect()->route('Login')->with('success', 'Cuenta creada con éxito. Por favor, inicia sesión.');
     }
 
-    // Cierre de sesión listo para usar después
+    // Funciones preparadas para acoplar tus cierres de sesión posteriormente
     public function logout(Request $request)
     {
         Auth::logout();
