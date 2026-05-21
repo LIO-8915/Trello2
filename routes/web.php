@@ -4,20 +4,27 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConfiguracionController;
 
-// Redirección inicial
-Route::get('/', function () {
-    return redirect()->route('Login');
-})->name('home'); 
+// 1. Al abrir la página por primera vez, exige iniciar sesión directamente
+Route::get('/', [AuthController::class, 'showLogin'])->name('Login');
 
-// Módulo de Autenticación Unificado
-Route::get('/login', [AuthController::class, 'showLogin'])->name('Login');
-Route::post('/login', [AuthController::class, 'login']);
+// 2. El formulario de inicio de sesión se procesa aquí mediante POST
+Route::post('/login', [AuthController::class, 'login'])->name('login.procesar');
+
+// 3. Registro de cuentas (frena inserciones si los datos vienen nulos)
 Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+// 4. Cierre de sesión
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Vistas privadas protegidas por el Middleware de Autenticación
+
+// RUTAS PROTEGIDAS: Solo accesibles si el inicio de sesión fue exitoso
 Route::middleware(['auth'])->group(function () {
     
+    // Pantalla de Inicio / Menú Principal (Welcome)
+    Route::get('/welcome', function () {
+        return view('welcome'); 
+    })->name('welcome');
+
     Route::get('/tablero', function () {
         return view('tablero');
     })->name('tablero');

@@ -8,54 +8,65 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    // Carga la vista 'Login' al entrar a la raíz del sistema
     public function showLogin()
     {
         return view('Login');
     }
 
-    // Iniciar Sesión comparando texto plano directamente
+    // Procesa el inicio de sesión y redirige a Welcome en caso de éxito
     public function login(Request $request)
-    {
+    {        
+        echo "<script>
+            alert('Entro al validate');
+        </script>";
+        // Validar que los datos no vengan vacíos
         $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
+        echo "<script>
+            alert('Salio de el validate');
+        </script>";
 
+        // Buscar al usuario por correo
         $user = User::where('email', $request->email)->first();
 
-        // Validación directa sin métodos Bcrypt automáticos
+        // Validación estricta en texto plano
         if ($user && $user->password === $request->password) {
+            
+            // Loguear manualmente en la sesión de Laravel
             Auth::login($user);
             $request->session()->regenerate();
-            return redirect()->route('tablero'); 
+            
+            // REDIRECCIÓN CORRECTA: Va directo al menú principal/inicio
+            return redirect()->route('welcome');
         }
 
+        // Si falla, regresa al formulario con un mensaje de error
         return back()->withErrors([
-            'email' => 'Las credenciales no coinciden con nuestros registros.',
+            'email' => 'El correo electrónico o la contraseña son incorrectos.',
         ]);
     }
 
-    // Registro Blindado: Si los datos no cumplen la regla obligatoria, no avanza a la DB
+    // Registro Blindado: No ejecuta el INSERT si los campos vienen nulos
     public function register(Request $request)
     {
-        // El validador actúa de freno. Si falta algún campo, cancela todo aquí.
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+        $validatedData = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8',
         ]);
 
-        // Únicamente si superó con éxito la validación se procede al almacenamiento
         User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'], // Guardado directo sin encriptar
+            'name'     => $validatedData['name'],
+            'email'    => $validatedData['email'],
+            'password' => $validatedData['password'], // Texto plano sin Hash
         ]);
 
-        return redirect()->route('Login')->with('success', 'Cuenta creada con éxito. Por favor, inicia sesión.');
+        return redirect()->route('Login')->with('success', 'Cuenta creada con éxito. Inicia sesión.');
     }
 
-    // Funciones preparadas para acoplar tus cierres de sesión posteriormente
     public function logout(Request $request)
     {
         Auth::logout();

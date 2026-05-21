@@ -90,10 +90,11 @@
                 </div>
                 {{-- SECCIÓN DE INICIO DE SESIÓN --}}
                 <div id="login-section">
-                    <form action="{{ route('Login') }}" method="POST">
-                        @csrf
+                    <form action="{{ route('login.procesar') }}" method="POST">
+                        @csrf {{-- Token de seguridad obligatorio de Laravel --}}
+                        
                         <div class="mb-3">
-                            <label class="form-label" style="color: rgb(161, 161, 161);">Correo Electrónico</label>
+                            <label class="form-label" style="color: rgb(161, 161, 161);">Usuario (Email)</label>
                             <input type="email" name="email" class="form-control" placeholder="correo@ejemplo.com" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color: white;" required>
                         </div>
                         
