@@ -6,14 +6,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Los atributos que son asignables masivamente (Mass Assignable).
+     * Es indispensable que 'name', 'email' y 'password' estén aquí
+     * para que el método User::create() no los ignore.
      *
      * @var array<int, string>
      */
@@ -24,7 +25,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Los atributos que deben ocultarse para las serializaciones (como respuestas JSON).
      *
      * @var array<int, string>
      */
@@ -34,30 +35,14 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * El mapeo y conversión de tipos de datos de la base de datos.
+     * * CRÍTICO: Se eliminó o comentó 'password' => 'hashed' para evitar 
+     * que Laravel encripte automáticamente el string en texto plano.
      *
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime'
+        'email_verified_at' => 'datetime',
+        // 'password' => 'hashed', <-- ELIMINADO/COMENTADO PARA TEXTO PLANO
     ];
-    protected $primaryKey = 'id_usuario';
-
-    public function tableros()
-    {
-        return $this->belongsToMany(Tablero::class, 'tablero_usuario', 'id_usuario', 'id_tablero')
-                    ->withPivot('rol')
-                    ->withTimestamps();
-    }
-
-    public function espacios()
-    {
-        // Relación Muchos a Muchos con Espacios
-        return $this->belongsToMany(Espacio::class, 'espacio_usuario', 'id_usuario', 'id_espacio');
-    }
-
-    public function comentarios()
-    {
-        return $this->hasMany(Comentario::class, 'user_id', 'id_usuario');
-    }
 }

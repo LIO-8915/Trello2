@@ -4,23 +4,18 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConfiguracionController;
 
-// 1. Al abrir la página por primera vez, exige iniciar sesión directamente
+// 1. Al abrir la página raíz por primera vez, exige iniciar sesión directamente
 Route::get('/', [AuthController::class, 'showLogin'])->name('Login');
 
-// 2. El formulario de inicio de sesión se procesa aquí mediante POST
+// 2. Procesamiento de formularios de acceso y registro
 Route::post('/login', [AuthController::class, 'login'])->name('login.procesar');
-
-// 3. Registro de cuentas (frena inserciones si los datos vienen nulos)
-Route::post('/register', [AuthController::class, 'register'])->name('register');
-
-// 4. Cierre de sesión
+Route::post('/register', [AuthController::class, 'register'])->name('register.procesar');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
-// RUTAS PROTEGIDAS: Solo accesibles si el inicio de sesión fue exitoso
+// 3. Rutas Privadas: Protegidas para que solo entren si el login fue exitoso
 Route::middleware(['auth'])->group(function () {
     
-    // Pantalla de Inicio / Menú Principal (Welcome)
+    // Pantalla de Welcome / Menú Principal de Inicio
     Route::get('/welcome', function () {
         return view('welcome'); 
     })->name('welcome');

@@ -8,70 +8,63 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    // Carga la vista 'Login' al entrar a la raíz del sistema
+    // Carga la pantalla inicial únicamente
     public function showLogin()
     {
         return view('Login');
     }
 
-    // Procesa el inicio de sesión y redirige a Welcome en caso de éxito
+    // Iniciar Sesión con la DB Local en Texto Plano
     public function login(Request $request)
-    {        
-        echo "<script>
-            alert('Entro al validate');
-        </script>";
-        // Validar que los datos no vengan vacíos
+    {
         $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
-        echo "<script>
-            alert('Salio de el validate');
-        </script>";
 
-        // Buscar al usuario por correo
+        // Busca el usuario en la tabla local
         $user = User::where('email', $request->email)->first();
 
-        // Validación estricta en texto plano
+        // Comparación estricta en texto plano
         if ($user && $user->password === $request->password) {
-            
-            // Loguear manualmente en la sesión de Laravel
-            Auth::login($user);
+            Auth::login($user); 
             $request->session()->regenerate();
             
-            // REDIRECCIÓN CORRECTA: Va directo al menú principal/inicio
             return redirect()->route('welcome');
         }
 
-        // Si falla, regresa al formulario con un mensaje de error
         return back()->withErrors([
             'email' => 'El correo electrónico o la contraseña son incorrectos.',
         ]);
     }
 
-    // Registro Blindado: No ejecuta el INSERT si los campos vienen nulos
+    // Registro Seguro: Frena el flujo si faltan campos para evitar el INSERT INTO con nulls
     public function register(Request $request)
     {
+        // Si la validación falla, Laravel regresa automáticamente sin tocar la DB
         $validatedData = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
         ]);
 
+        // Guardado directo y limpio en la DB local en texto plano
         User::create([
             'name'     => $validatedData['name'],
             'email'    => $validatedData['email'],
-            'password' => $validatedData['password'], // Texto plano sin Hash
+            'password' => $validatedData['password'], 
         ]);
 
-        return redirect()->route('Login')->with('success', 'Cuenta creada con éxito. Inicia sesión.');
+        return redirect()->route('Login')->with('success', 'Cuenta creada con éxito. ¡Ya puedes iniciar sesión!');
     }
 
+    // Cierre de Sesión (Logout)
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        
         return redirect()->route('Login');
     }
 }

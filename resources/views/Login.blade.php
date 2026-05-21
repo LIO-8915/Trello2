@@ -116,7 +116,7 @@
                 {{-- SECCIÓN DE REGISTRO --}}
                 <div id="register-section" style="display: none;">
                     <h2 class="mt-2 text-center" style="color: rgb(161, 161, 161); font-size: 20px;">Crear Cuenta</h2>
-                    <form action="{{ route('register') }}" method="POST">
+                    <form action="{{ route('register.procesar') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <input type="text" name="name" class="form-control" placeholder="Nombre completo" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color: white;" required>
