@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash; // <-- CORREGIDO: Importación correcta para encriptar
 
 class AuthController extends Controller
 {
@@ -14,45 +15,45 @@ class AuthController extends Controller
         return view('Login');
     }
 
-    // Iniciar Sesión con la DB Local en Texto Plano
+    // Iniciar Sesión de forma Segura (Validando el Hash de la DB)
     public function login(Request $request)
     {
-        $request->validate([
+        // 1. Validar que los campos no vengan vacíos
+        $credentials = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // Busca el usuario en la tabla local
-        $user = User::where('email', $request->email)->first();
-
-        // Comparación estricta en texto plano
-        if ($user && $user->password === $request->password) {
-            Auth::login($user); 
+        // 2. Auth::attempt busca el email y compara automáticamente 
+        // la contraseña usando Hash::check detrás de escena.
+        if (Auth::attempt($credentials)) {
+            // Regenera la sesión para evitar ataques de fijación de sesión
             $request->session()->regenerate();
             
             return redirect()->route('welcome');
         }
 
+        // Si falla, regresa con el mensaje de error
         return back()->withErrors([
             'email' => 'El correo electrónico o la contraseña son incorrectos.',
-        ]);
+        ])->withInput($request->only('email')); // Mantiene el correo escrito por comodidad
     }
 
-    // Registro Seguro: Frena el flujo si faltan campos para evitar el INSERT INTO con nulls
+    // Registro Seguro con Encriptación Estándar
     public function register(Request $request)
     {
         // Si la validación falla, Laravel regresa automáticamente sin tocar la DB
-        $validatedData = $request->validate([
+        $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
         ]);
 
-        // Guardado directo y limpio en la DB local en texto plano
+        // Guardado seguro encriptando la contraseña
         User::create([
-            'name'     => $validatedData['name'],
-            'email'    => $validatedData['email'],
-            'password' => $validatedData['password'], 
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password), // Encriptación correcta
         ]);
 
         return redirect()->route('Login')->with('success', 'Cuenta creada con éxito. ¡Ya puedes iniciar sesión!');
