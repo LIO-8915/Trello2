@@ -54,7 +54,7 @@ class Auth_Controller extends Controller
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
         ]);
 
         // Redirecciona al login con un mensaje de éxito
