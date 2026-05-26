@@ -225,6 +225,12 @@
                     </div>
                 </div>
             </div>
+            @if(session('login_success_name'))
+    <script>
+        // Esto crea la ventana emergente en el navegador usando el nombre real de la BD
+        alert("¡Conexión Exitosa con la Base de Datos!\nUsuario logueado: {{ session('login_success_name') }}");
+    </script>
+@endif
 
 @endsection
 

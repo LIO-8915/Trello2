@@ -14,30 +14,31 @@ class Auth_Controller extends Controller
         return view('Login');
     }
 
-    // Procesa el inicio de sesión
     public function login(Request $request)
     {
-        // 1. Validar que lleguen los datos
+        // 1. Validar que el formulario envíe los datos
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // 2. Buscar al usuario manualmente por su correo 
+        // 2. Intentar traer al usuario desde tu base de datos 'trello2'
         $user = User::where('email', $request->email)->first();
 
-        // 3. Comparar contraseña en texto plano (SIN HASH)
-        if ($user && $user->password == $request->password) {
-            Auth::login($user); // Inicia la sesión manualmente en el sistema 
+        // 3. Verificar si el usuario existe y si la contraseña coincide (en texto plano o hash)
+        if ($user && ($user->contraseña === $request->password || \Illuminate\Support\Facades\Hash::check($request->password, $user->contraseña))) {
+            
+            // Iniciamos la sesión en el sistema
+            Auth::login($user);
             $request->session()->regenerate();
             
-            // 4. Redirigir usando el nombre exacto de la ruta
-            return redirect()->route('home'); 
+            // Redirigimos al tablero pasando el NOMBRE extraído de la base de datos
+            return redirect()->route('tablero')->with('login_success_name', $user->nombre); 
         }
 
-        // Si los datos son incorrectos
+        // Si los datos no coinciden en la base de datos, regresa con error
         return back()->withErrors([
-            'email' => 'Las credenciales no coinciden con nuestros registros.',
+            'email' => 'Las credenciales no coinciden con nuestra base de datos.',
         ]);
     }
 
