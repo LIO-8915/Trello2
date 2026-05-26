@@ -1,34 +1,61 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth_Controller;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+Route::get('/login', [Auth_Controller::class, 'showLogin'])->name('Login');
+Route::post('/login', [Auth_Controller::class, 'login'])->name('postLogin');
+Route::post('/logout', [Auth_Controller::class, 'logout'])->name('logout');
+Route::post('/register', [Auth_Controller::class, 'register'])->name('register');
+
+Route::get('/', function () {
+    return view('welcome');
+})->name('home'); 
+
+// Route::get('/login', function () {
+//     return view('Login');
+// })->name('Login');
+
+Route::get('/tablero', function () {
+    return view('tablero');
+})->name('tablero');
+
+Route::get('/perfil', function () {
+    return view('perfil');
+})->name('perfil');
+
+Route::get('/welcome', function () {
+    return view('welcome');
+})->name('welcome')->middleware('auth');
+
+
+// Route::get('/config', function () {
+//     return view('config');
+// })->name('config');
+
 use App\Http\Controllers\ConfiguracionController;
 
-// 1. Al abrir la página raíz por primera vez, exige iniciar sesión directamente
-Route::get('/', [AuthController::class, 'showLogin'])->name('Login');
+Route::get('/config', [ConfiguracionController::class, 'index'])->name('config');
+//Route::put('/config', [ConfiguracionController::class, 'update'])->name('configuraciones.update');
+//Logan R
+use Illuminate\Support\Facades\DB;
 
-// 2. Procesamiento de formularios de acceso y registro
-Route::post('/login', [AuthController::class, 'login'])->name('login.procesar');
-Route::post('/register', [AuthController::class, 'register'])->name('register.procesar');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-Route::middleware('guest')->group(function () {
-    // Login
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('Login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-
-    // Registro
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
-});
-
-// Rutas para Usuarios Autenticados
-Route::middleware('auth')->group(function () {
-    // Dashboard / Inicio del sistema Trello
-    Route::get('/welcome', function () {
-        return view('welcome');
-    })->name('welcome');
-
-    // Cierre de sesión
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/test-db', function () {
+    try {
+        DB::connection()->getPdo();
+        return "¡Conexión exitosa a la base de datos: " . DB::connection()->getDatabaseName() . "!";
+    } catch (\Exception $e) {
+        return "Error al conectar a la base de datos: " . $e->getMessage();
+    }
 });
