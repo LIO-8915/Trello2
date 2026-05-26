@@ -31,11 +31,9 @@ class AuthController extends Controller
         ]);
 
         // Auth::attempt busca el correo y comprueba la contraseña encriptada de forma automática
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            // Regenerar sesión por seguridad contra ataques de fijación
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
-            // Redirección a la pantalla principal protegida
             return redirect()->route('welcome');
         }
 

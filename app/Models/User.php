@@ -29,6 +29,5 @@ class User extends Authenticatable
     // Casteo automático de tipos de datos de Laravel
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed', // Laravel > 10 encriptará/verificará automáticamente
     ];
 }
