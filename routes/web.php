@@ -12,21 +12,23 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.procesar');
 Route::post('/register', [AuthController::class, 'register'])->name('register.procesar');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// 3. Rutas Privadas: Protegidas para que solo entren si el login fue exitoso
-Route::middleware(['auth'])->group(function () {
-    
-    // Pantalla de Welcome / Menú Principal de Inicio
+Route::middleware('guest')->group(function () {
+    // Login
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('Login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+
+    // Registro
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+});
+
+// Rutas para Usuarios Autenticados
+Route::middleware('auth')->group(function () {
+    // Dashboard / Inicio del sistema Trello
     Route::get('/welcome', function () {
-        return view('welcome'); 
+        return view('welcome');
     })->name('welcome');
 
-    Route::get('/tablero', function () {
-        return view('tablero');
-    })->name('tablero');
-
-    Route::get('/perfil', function () {
-        return view('perfil');
-    })->name('perfil');
-
-    Route::get('/config', [ConfiguracionController::class, 'index'])->name('config');
+    // Cierre de sesión
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

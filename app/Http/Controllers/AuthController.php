@@ -5,64 +5,73 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash; // <-- CORREGIDO: Importación correcta para encriptar
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Carga la pantalla inicial únicamente
+    // Mostrar el formulario de Login
     public function showLogin()
     {
         return view('Login');
     }
 
-    // Iniciar Sesión de forma Segura (Validando el Hash de la DB)
+    // Mostrar el formulario de Registro
+    public function showRegister()
+    {
+        return view('Register');
+    }
+
+    // Procesar el Inicio de Sesión
     public function login(Request $request)
     {
-        // 1. Validar que los campos no vengan vacíos
+        // Validación estricta de campos presentes
         $credentials = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // 2. Auth::attempt busca el email y compara automáticamente 
-        // la contraseña usando Hash::check detrás de escena.
-        if (Auth::attempt($credentials)) {
-            // Regenera la sesión para evitar ataques de fijación de sesión
+        // Auth::attempt busca el correo y comprueba la contraseña encriptada de forma automática
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            // Regenerar sesión por seguridad contra ataques de fijación
             $request->session()->regenerate();
             
+            // Redirección a la pantalla principal protegida
             return redirect()->route('welcome');
         }
 
-        // Si falla, regresa con el mensaje de error
+        // Si las credenciales fallan, regresa con el error
         return back()->withErrors([
             'email' => 'El correo electrónico o la contraseña son incorrectos.',
-        ])->withInput($request->only('email')); // Mantiene el correo escrito por comodidad
+        ])->withInput($request->only('email'));
     }
 
-    // Registro Seguro con Encriptación Estándar
+    // Procesar el Registro de Cuentas
     public function register(Request $request)
     {
-        // Si la validación falla, Laravel regresa automáticamente sin tocar la DB
+        // Requerimientos estrictos basados en tu esquema SQL de la tabla users
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8',
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'], // 'confirmed' requiere un input llamado password_confirmation
         ]);
 
-        // Guardado seguro encriptando la contraseña
+        // Guardado seguro cumpliendo con los constraints de integridad (NOT NULL)
         User::create([
             'name'     => $request->name,
             'email'    => $request->email,
-            'password' => Hash::make($request->password), // Encriptación correcta
+            'password' => Hash::make($request->password), // Encriptación Bcrypt compatible con tu .sql
         ]);
 
-        return redirect()->route('Login')->with('success', 'Cuenta creada con éxito. ¡Ya puedes iniciar sesión!');
+        // Redirige al Login con un mensaje de éxito en sesión flash
+        return redirect()->route('Login')->with('success', '¡Cuenta creada con éxito! Ya puedes iniciar sesión.');
     }
 
-    // Cierre de Sesión (Logout)
+    // Cierre de Sesión Seguro
     public function logout(Request $request)
     {
         Auth::logout();
+        
+        // Destruir datos de sesión y regenerar token CSRF para el próximo usuario
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
