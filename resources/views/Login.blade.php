@@ -90,7 +90,7 @@
                 </div>
                 {{-- SECCIÓN DE INICIO DE SESIÓN --}}
                 <div id="login-section">
-                    <form action="{{ route('login.post') }}" method="POST">
+                    <form action="{{ route('postLogin') }}" method="POST">
                         @csrf <div class="mb-3">
                             <label class="form-label" style="color: rgb(161, 161, 161);">Usuario (Email)</label>
                             <input type="email" name="email" class="form-control" placeholder="correo@ejemplo.com" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color: white;" required>
@@ -114,7 +114,7 @@
                 {{-- SECCIÓN DE REGISTRO --}}
                 <div id="register-section" style="display: none;">
                     <h2 class="mt-2 text-center" style="color: rgb(161, 161, 161); font-size: 20px;">Crear Cuenta</h2>
-                    <form action="{{ route('register.post') }}" method="POST">
+                    <form action="{{ route('register') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <input type="text" name="name" class="form-control" placeholder="Nombre completo" style="background-color: rgba(220, 220, 220, 0.33); border-color: transparent; color: white;" required>
